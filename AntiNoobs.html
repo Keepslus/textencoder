@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Quadtriple Encoding Example</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f5f5f5;
+      margin: 0;
+      padding: 20px;
+    }
+
+    .container {
+      background-color: #fff;
+      border-radius: 5px;
+      padding: 20px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: bold;
+    }
+
+    input[type="text"],
+    textarea {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 3px;
+      font-size: 14px;
+    }
+
+    button {
+      padding: 10px 15px;
+      background-color: #4CAF50;
+      color: #fff;
+      border: none;
+      border-radius: 3px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+
+    textarea {
+      resize: vertical;
+    }
+
+    .result-container {
+      margin-top: 20px;
+    }
+
+    .result-label {
+      margin-bottom: 10px;
+    }
+
+    .result-textarea {
+      min-height: 100px;
+    }
+  </style>
+  <script>
+    function quadtripleEncode() {
+      var originalString = document.getElementById('input').value;
+
+      // Base64 Encoding (First)
+      var base64EncodedString1 = btoa(originalString);
+
+      // URL Encoding (Base64 Encoded String)
+      var urlEncodedString1 = encodeURIComponent(base64EncodedString1);
+
+      // Base64 Encoding (Second)
+      var base64EncodedString2 = btoa(urlEncodedString1);
+
+      // URL Encoding (Base64 Encoded String)
+      var urlEncodedString2 = encodeURIComponent(base64EncodedString2);
+
+      document.getElementById('encoded').textContent = urlEncodedString2;
+    }
+
+    function quadtripleDecode() {
+      var quadtripleEncodedString = document.getElementById('input').value;
+
+      // URL Decoding (Base64 Encoded String)
+      var base64EncodedString2 = decodeURIComponent(quadtripleEncodedString);
+
+      // Base64 Decoding (Second)
+      var urlEncodedString1 = atob(base64EncodedString2);
+
+      // URL Decoding (Base64 Encoded String)
+      var base64EncodedString1 = decodeURIComponent(urlEncodedString1);
+
+      // Base64 Decoding (First)
+      var decodedString = atob(base64EncodedString1);
+
+      document.getElementById('decoded').textContent = decodedString;
+    }
+  </script>
+</head>
+<body>
+  <div class="container">
+    <label for="input">Enter a string:</label>
+    <input type="text" id="input" />
+    <button onclick="quadtripleEncode()">Quadtriple Encode</button>
+    <button onclick="quadtripleDecode()">Decode</button>
+
+    <div class="result-container">
+      <div class="result-label">Quadtriple Encoded string:</div>
+      <textarea id="encoded" class="result-textarea" readonly></textarea>
+    </div>
+
+    <div class="result-container">
+      <div class="result-label">Decoded string:</div>
+      <textarea id="decoded"class="result-textarea" readonly></textarea>
+    </div>
+  </div>
+</body>
+</html>
