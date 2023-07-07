@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Quadtriple Encoding Example</title>
+  <title>Quadtriple and Hexadecimal Encoding Example</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -15,6 +15,15 @@
       border-radius: 5px;
       padding: 20px;
       box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      max-width: 800px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    h1 {
+      text-align: center;
     }
 
     label {
@@ -30,6 +39,7 @@
       border: 1px solid #ccc;
       border-radius: 3px;
       font-size: 14px;
+      box-sizing: border-box;
     }
 
     button {
@@ -40,6 +50,9 @@
       border-radius: 3px;
       cursor: pointer;
       font-size: 14px;
+      margin-top: 10px;
+      width: 100%;
+      box-sizing: border-box;
     }
 
     textarea {
@@ -48,6 +61,7 @@
 
     .result-container {
       margin-top: 20px;
+      width: 100%;
     }
 
     .result-label {
@@ -56,14 +70,60 @@
 
     .result-textarea {
       min-height: 100px;
+      width: 100%;
     }
   </style>
   <script>
+    function getRandomNumber() {
+      let randomNumber;
+      do {
+        randomNumber = Math.floor(Math.random() * 31) - 10;
+      } while (randomNumber <= 10 || randomNumber % 2 === 0 || randomNumber === 11);
+
+      // Generate a random key between 0 and 255
+      const key = Math.floor(Math.random() * 256);
+
+      // XOR the number with the key to scramble the bits
+      const scrambledNumber = randomNumber ^ key;
+
+      return scrambledNumber;
+    }
+
+    function hexEncode(string) {
+      var hexEncodedString = "";
+      for (var i = 0; i < string.length; i++) {
+        var charCode = string.charCodeAt(i).toString(16);
+        hexEncodedString += "%" + charCode;
+      }
+      return hexEncodedString;
+    }
+
+    function hexDecode(string) {
+      var hexDecodedString = "";
+      var hexCodes = string.split("%");
+      for (var i = 1; i < hexCodes.length; i++) {
+        var char = String.fromCharCode(parseInt(hexCodes[i], 16));
+        hexDecodedString += char;
+      }
+      return hexDecodedString;
+    }
+
     function quadtripleEncode() {
       var originalString = document.getElementById('input').value;
+      var randomMultiplier = getRandomNumber();
+
+      // Convert the string to binary code
+      var binaryString = originalString.split('').map(function(char) {
+        return char.charCodeAt(0).toString(2) + '!ER!';
+      }).join('');
+
+      // Multiply the numbers in the binary string by the random multiplier
+      var encodedString = binaryString.replace(/\d+/g, function(match) {
+        return match * randomMultiplier;
+      });
 
       // Base64 Encoding (First)
-      var base64EncodedString1 = btoa(originalString);
+      var base64EncodedString1 = btoa(encodedString);
 
       // URL Encoding (Base64 Encoded String)
       var urlEncodedString1 = encodeURIComponent(base64EncodedString1);
@@ -74,23 +134,51 @@
       // URL Encoding (Base64 Encoded String)
       var urlEncodedString2 = encodeURIComponent(base64EncodedString2);
 
-      document.getElementById('encoded').textContent = urlEncodedString2;
+      // Append the random multiplier and underscore to the encoded string
+      var encodedResult = btoa(urlEncodedString2 + "!ER!" + randomMultiplier);
+
+      // Hex Encoding
+      var hexEncodedResult = hexEncode(encodedResult);
+
+      document.getElementById('encoded').textContent = hexEncodedResult;
     }
 
     function quadtripleDecode() {
-      var quadtripleEncodedString = document.getElementById('input').value;
+      var hexEncodedString = document.getElementById('input').value;
+
+      // Hex Decoding
+      var encodedResult = hexDecode(hexEncodedString);
+
+      // Decode the Quadtriple Encoded string
+      var decodedString = atob(encodedResult);
+
+      // Extract the random multiplier and encoded string
+      var parts = decodedString.split("!ER!");
+      var encodedString = parts[0];
+      var randomMultiplier = parseInt(parts[1]);
 
       // URL Decoding (Base64 Encoded String)
-      var base64EncodedString2 = decodeURIComponent(quadtripleEncodedString);
+      var urlEncodedString2 = decodeURIComponent(encodedString);
 
       // Base64 Decoding (Second)
-      var urlEncodedString1 = atob(base64EncodedString2);
+      var base64EncodedString1 = atob(urlEncodedString2);
 
       // URL Decoding (Base64 Encoded String)
-      var base64EncodedString1 = decodeURIComponent(urlEncodedString1);
+      var urlEncodedString1 = decodeURIComponent(base64EncodedString1);
 
       // Base64 Decoding (First)
-      var decodedString = atob(base64EncodedString1);
+      var binaryString = atob(urlEncodedString1);
+
+      // Divide the numbers in the decoded string by the random multiplier
+      binaryString = binaryString.replace(/\d+/g, function(match) {
+        return match / randomMultiplier;
+      });
+
+      // Convert the binary code back to original characters
+      var binaryCodes = binaryString.split('!ER!');
+      var decodedString = binaryCodes.map(function(code) {
+        return String.fromCharCode(parseInt(code, 2));
+      }).join('');
 
       document.getElementById('decoded').textContent = decodedString;
     }
@@ -98,19 +186,20 @@
 </head>
 <body>
   <div class="container">
+    <h1>/Welcome</h1>
     <label for="input">Enter a string:</label>
     <input type="text" id="input" />
-    <button onclick="quadtripleEncode()">Quadtriple Encode</button>
-    <button onclick="quadtripleDecode()">Decode</button>
+    <button onclick="quadtripleEncode()">Encrypt</button>
+    <button onclick="quadtripleDecode()">Decrypt</button>
 
     <div class="result-container">
-      <div class="result-label">Quadtriple Encoded string:</div>
+      <div class="result-label">Encrypted string:</div>
       <textarea id="encoded" class="result-textarea" readonly></textarea>
     </div>
 
     <div class="result-container">
-      <div class="result-label">Decoded string:</div>
-      <textarea id="decoded"class="result-textarea" readonly></textarea>
+      <div class="result-label">Decrypted string:</div>
+      <textarea id="decoded" class="result-textarea" readonly></textarea>
     </div>
   </div>
 </body>
